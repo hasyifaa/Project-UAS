@@ -9,6 +9,7 @@ struct dataKendaraan {
     string merk;
     string warna;
     int waktuMasuk;
+    int waktuKeluar;
     bool terisi;
 };
 void inisialisasiData (dataKendaraan dataMotor[], int n) {
@@ -17,6 +18,7 @@ void inisialisasiData (dataKendaraan dataMotor[], int n) {
         dataMotor[i].merk= "-";
         dataMotor[i].warna= "-";
         dataMotor[i].waktuMasuk= 0;
+        dataMotor[i].waktuKeluar= 0;
         dataMotor[i].terisi= false;
     }
 }
@@ -38,7 +40,7 @@ int cariIndex(dataKendaraan dataMotor[], int n, string plat) {
 
     return -1;
 }
-void kendaraanMasuk(dataKendaraan dataMotor[], int n) {
+void kendaraanMasuk(dataKendaraan dataMotor[], int n, int &totalMasuk) {
     int slotKosong = -1;
     string plat;
 
@@ -77,9 +79,41 @@ void kendaraanMasuk(dataKendaraan dataMotor[], int n) {
     cin >> dataMotor[slotKosong].waktuMasuk;
 
     dataMotor[slotKosong].terisi = true;
+    totalMasuk++;
 
     cout << "\nKendaraan berhasil dicatat!\n";
     cout << "Nomor slot parkir : " << slotKosong + 1 << endl;
+}
+void kendaraanKeluar(dataKendaraan dataMotor[], int n, int &totalKeluar) {
+    string plat;
+    int waktuKeluar;
+
+    cout << "\n===== PENCATATAN KENDARAAN KELUAR =====\n";
+    cout << "Masukkan nomor plat : ";
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, plat);
+
+    int index = cariIndex(dataMotor, n, plat);
+
+    if (index != -1) {
+        cout << "Kendaraan ditemukan!\n";
+        cout << "Nomor plat : " << dataMotor[index].platNomor << endl;
+        cout << "Nomor slot : " << index + 1 << endl;
+
+        cout << "Masukkan waktu keluar (contoh: 1015) : ";
+        cin >> waktuKeluar;
+
+        dataMotor[index].waktuKeluar = waktuKeluar;
+        dataMotor[index].terisi = false;
+
+        totalKeluar++;
+
+        cout << "\nKendaraan berhasil keluar!\n";
+        cout << "Waktu keluar : " << dataMotor[index].waktuKeluar << endl;
+    } else {
+        cout << "\nKendaraan tidak ditemukan!\n";
+    }
 }
 void cariKendaraan(dataKendaraan dataMotor[], int n) {
     string plat;
@@ -119,9 +153,25 @@ void tampilkanKapasitas(dataKendaraan dataMotor[], int n) {
     cout << left << setw(20) << "KAPASITAS TERSEDIA" << " : " << tersedia << endl;
     cout << left << setw(20) << "SLOT TERISI" << " : " << terisi << endl;
 }
+void statistikParkir(dataKendaraan dataMotor[], int n, int totalMasuk, int totalKeluar) {
+    int sedangParkir = hitungSlot(dataMotor, n);
+    int slotKosong = n - sedangParkir;
+
+    cout << "\n===== STATISTIK PARKIR =====\n";
+    cout << left << setw(30) << "TOTAL KENDARAAN MASUK" << " : " << totalMasuk << endl;
+    cout << left << setw(30) << "TOTAL KENDARAAN KELUAR" << " : " << totalKeluar << endl;
+    cout << left << setw(30) << "KENDARAAN SEDANG PARKIR" << " : " << sedangParkir << endl;
+    cout << left << setw(30) << "SLOT PARKIR KOSONG" << " : " << slotKosong << endl;
+    cout << left << setw(30) << "KAPASITAS PARKIR" << " : " << n << endl;
+}
 int main () {
     const int kapasitasParkir = 400;
     dataKendaraan dataMotor[kapasitasParkir] = {};
+
+    inisialisasiData(dataMotor, kapasitasParkir);
+
+    int totalMasuk = 0;
+    int totalKeluar = 0;
     
     int pilihan;
 
@@ -130,19 +180,27 @@ int main () {
         cout << "1. Kendaraan Masuk\n";
         cout << "2. Cari Kendaraan\n";
         cout << "3. Lihat Kapasitas Parkir\n";
+        cout << "4. Kendaraan Keluar\n";
+        cout << "5. Statistik Parkir\n";
         cout << "0. Keluar\n";
         cout << "Pilih menu : ";
         cin >> pilihan;
 
         switch (pilihan) {
             case 1:
-                kendaraanMasuk(dataMotor, kapasitasParkir);
+                kendaraanMasuk(dataMotor, kapasitasParkir, totalMasuk);
                 break;
             case 2:
                 cariKendaraan(dataMotor, kapasitasParkir);
                 break;
             case 3:
                 tampilkanKapasitas(dataMotor, kapasitasParkir);
+                break;
+            case 4:
+                kendaraanKeluar(dataMotor, kapasitasParkir, totalKeluar);
+                break;
+            case 5:
+                statistikParkir(dataMotor, kapasitasParkir, totalMasuk, totalKeluar);
                 break;
             case 0:
                 cout << "Program selesai.\n";
