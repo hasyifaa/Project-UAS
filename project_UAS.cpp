@@ -40,6 +40,31 @@ int cariIndex(dataKendaraan dataMotor[], int n, string plat) {
 
     return -1;
 }
+int bacaWaktu() {
+    int jam, menit;
+    char pemisah;
+
+    while (true) {
+        cin >> jam >> pemisah >> menit;
+
+        if (cin.fail()) {                                   
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Format salah. Contoh 9.35 : ";
+        } else if ((pemisah != '.' && pemisah != ':') ||
+                   jam < 0 || jam > 23 || menit < 0 || menit > 59) {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Waktu tidak valid. Contoh 9.35 : ";
+        } else {
+            return jam * 60 + menit;
+        }
+    }
+}
+void tampilWaktu(int totalMenit) {
+    cout << setfill('0') << setw(2) << totalMenit / 60
+         << ":" << setw(2) << totalMenit % 60
+         << setfill(' ');
+}
 void kendaraanMasuk(dataKendaraan dataMotor[], int n, int &totalMasuk) {
     int slotKosong = -1;
     string plat;
@@ -75,8 +100,8 @@ void kendaraanMasuk(dataKendaraan dataMotor[], int n, int &totalMasuk) {
     cout << "Masukkan warna motor : ";
     cin >> dataMotor[slotKosong].warna;
 
-    cout << "Masukkan waktu masuk (contoh: 830) : ";
-    cin >> dataMotor[slotKosong].waktuMasuk;
+    cout << "Masukkan waktu masuk (contoh = 9.35) : ";
+    dataMotor[slotKosong].waktuMasuk = bacaWaktu();
 
     dataMotor[slotKosong].terisi = true;
     totalMasuk++;
@@ -101,16 +126,17 @@ void kendaraanKeluar(dataKendaraan dataMotor[], int n, int &totalKeluar) {
         cout << "Nomor plat : " << dataMotor[index].platNomor << endl;
         cout << "Nomor slot : " << index + 1 << endl;
 
-        cout << "Masukkan waktu keluar (contoh: 1015) : ";
-        cin >> waktuKeluar;
+        cout << "Masukkan waktu keluar (contoh = 9.35) : ";
+        waktuKeluar = bacaWaktu();
 
         dataMotor[index].waktuKeluar = waktuKeluar;
         dataMotor[index].terisi = false;
-
         totalKeluar++;
 
         cout << "\nKendaraan berhasil keluar!\n";
-        cout << "Waktu keluar : " << dataMotor[index].waktuKeluar << endl;
+        cout << "Waktu keluar : ";
+        tampilWaktu(dataMotor[index].waktuKeluar);
+        cout << endl;
     } else {
         cout << "\nKendaraan tidak ditemukan!\n";
     }
@@ -130,7 +156,9 @@ void cariKendaraan(dataKendaraan dataMotor[], int n) {
         cout << "Nomor plat : " << dataMotor[index].platNomor << endl;
         cout << "Merk motor : " << dataMotor[index].merk << endl;
         cout << "Warna motor : " << dataMotor[index].warna << endl;
-        cout << "Waktu masuk : " << dataMotor[index].waktuMasuk << endl;
+        cout << "Waktu masuk : "; 
+        tampilWaktu(dataMotor[index].waktuMasuk); 
+        cout << endl;
         cout << "Nomor slot : " << index + 1 << endl;
     } else {
         cout << "\nKendaraan tidak ditemukan!\n";
