@@ -93,7 +93,7 @@ int bacaWaktu() {
     }
 }
 void tampilWaktu(int totalMenit) {
-    cout << setfill('0') << setw(2) << totalMenit / 60
+    cout << right<< setfill('0') << setw(2) << totalMenit / 60
          << ":" << setw(2) << totalMenit % 60
          << setfill(' ');
 }
