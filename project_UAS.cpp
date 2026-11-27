@@ -93,9 +93,7 @@ int bacaWaktu() {
     }
 }
 void tampilWaktu(int totalMenit) {
-    cout << right<< setfill('0') << setw(2) << totalMenit / 60
-         << ":" << setw(2) << totalMenit % 60
-         << setfill(' ');
+    cout << right << setfill('0') << setw(2) << totalMenit / 60 << ":" << setw(2) << totalMenit % 60 << setfill(' ');
 }
 void kendaraanMasuk(dataKendaraan dataMotor[], int n, int &totalMasuk) {
     int slotKosong = -1;
@@ -238,12 +236,8 @@ void tampilkanKapasitas(dataKendaraan dataMotor[], int n) {
     int tersedia = n - terisi;
 
     for (int i = 0; i < n; i++) {
-        cout << "slot" << i + 1 << " : ";
-
         if (dataMotor[i].terisi) {
-            cout << "terisi " << dataMotor[i].platNomor << " -- " << dataMotor[i].merk << endl;
-        } else {
-            cout << "kosong" << endl;
+            cout << "slot " << i + 1 << " : " << dataMotor[i].platNomor << " -- " << dataMotor[i].merk << endl;
         }
     }
     cout << left << setw(20) << "KAPASITAS PARKIR" << " : " << n << endl;
