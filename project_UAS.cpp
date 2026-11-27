@@ -2,24 +2,29 @@
 #include <iomanip>
 #include <string>
 #include <limits>
+#include <cctype>
 using namespace std;
 
 struct dataKendaraan {
     string platNomor;
     string merk;
     string warna;
+    string hariMasuk;
+    string hariKeluar;
     int waktuMasuk;
     int waktuKeluar;
     bool terisi;
 };
 void inisialisasiData (dataKendaraan dataMotor[], int n) {
-    for (int i=0; i<n; i++) {
-        dataMotor[i].platNomor= "-";
-        dataMotor[i].merk= "-";
-        dataMotor[i].warna= "-";
-        dataMotor[i].waktuMasuk= 0;
-        dataMotor[i].waktuKeluar= 0;
-        dataMotor[i].terisi= false;
+    for (int i = 0; i < n; i++) {
+        dataMotor[i].platNomor = "-";
+        dataMotor[i].merk = "-";
+        dataMotor[i].warna = "-";
+        dataMotor[i].hariMasuk = "-";
+        dataMotor[i].hariKeluar = "-";
+        dataMotor[i].waktuMasuk = 0;
+        dataMotor[i].waktuKeluar = 0;
+        dataMotor[i].terisi = false;
     }
 }
 int hitungSlot (dataKendaraan dataMotor[], int n) {
@@ -40,6 +45,33 @@ int cariIndex(dataKendaraan dataMotor[], int n, string plat) {
 
     return -1;
 }
+int indeksHari(string hari) {
+    for (int i = 0; i < hari.length(); i++) {
+        hari[i] = tolower(hari[i]);
+    }
+    if (hari == "senin") return 0;
+    else if (hari == "selasa") return 1;
+    else if (hari == "rabu") return 2;
+    else if (hari == "kamis") return 3;
+    else if (hari == "jumat") return 4;
+    else if (hari == "sabtu") return 5;
+    else if (hari == "minggu") return 6;
+
+    return -1;
+}
+string bacaHari() {
+    string hari;
+
+    while (true) {
+        cin >> hari;
+
+        if (indeksHari(hari) == -1) {
+            cout << "Nama hari tidak valid. Masukkan kembali : ";
+        } else {
+            return hari;
+        }
+    }
+}
 int bacaWaktu() {
     int jam, menit;
     char pemisah;
@@ -47,14 +79,14 @@ int bacaWaktu() {
     while (true) {
         cin >> jam >> pemisah >> menit;
 
-        if (cin.fail()) {                                   
+        if (cin.fail()) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Format salah. Contoh 9.35 : ";
+            cout << "Format salah. Contoh 9.35 atau 10.30 : ";
         } else if ((pemisah != '.' && pemisah != ':') ||
-                   jam < 0 || jam > 23 || menit < 0 || menit > 59) {
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Waktu tidak valid. Contoh 9.35 : ";
+                    jam < 0 || jam > 23 || menit < 0 || menit > 59) {
+            cin. ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Waktu tidak valid. Contoh 9.35 atau 10.30 : ";
         } else {
             return jam * 60 + menit;
         }
@@ -100,6 +132,9 @@ void kendaraanMasuk(dataKendaraan dataMotor[], int n, int &totalMasuk) {
     cout << "Masukkan warna motor : ";
     cin >> dataMotor[slotKosong].warna;
 
+    cout << "Masukkan hari masuk : ";
+    dataMotor[slotKosong].hariMasuk = bacaHari();
+
     cout << "Masukkan waktu masuk (contoh = 9.35) : ";
     dataMotor[slotKosong].waktuMasuk = bacaWaktu();
 
@@ -111,7 +146,9 @@ void kendaraanMasuk(dataKendaraan dataMotor[], int n, int &totalMasuk) {
 }
 void kendaraanKeluar(dataKendaraan dataMotor[], int n, int &totalKeluar) {
     string plat;
+    string hariKeluar;
     int waktuKeluar;
+    int durasiMenit;
 
     cout << "\n===== PENCATATAN KENDARAAN KELUAR =====\n";
     cout << "Masukkan nomor plat : ";
@@ -126,17 +163,49 @@ void kendaraanKeluar(dataKendaraan dataMotor[], int n, int &totalKeluar) {
         cout << "Nomor plat : " << dataMotor[index].platNomor << endl;
         cout << "Nomor slot : " << index + 1 << endl;
 
+        cout << "Hari masuk : " << dataMotor[index].hariMasuk << endl;
+        cout << "Waktu masuk : ";
+        tampilWaktu(dataMotor[index].waktuMasuk);
+        cout << endl;
+
+        cout << "Masukkan hari keluar : ";
+        hariKeluar = bacaHari();
+
         cout << "Masukkan waktu keluar (contoh = 9.35) : ";
         waktuKeluar = bacaWaktu();
 
+        int selisihHari = (indeksHari(hariKeluar) - indeksHari(dataMotor[index].hariMasuk) + 7) % 7;
+
+        durasiMenit = (selisihHari * 1440) + (waktuKeluar - dataMotor[index].waktuMasuk);
+
+        if (durasiMenit < 0) {
+            cout << "\nHari atau waktu keluar tidak valid!\n";
+            cout << "Kendaraan tetap tercatat di parkiran.\n";
+            return;
+        }
+
+        dataMotor[index].hariKeluar = hariKeluar;
         dataMotor[index].waktuKeluar = waktuKeluar;
+
+        int durasiHari = durasiMenit / 1440;
+        int sisaMenit = durasiMenit % 1440;
+        int durasiJam = sisaMenit / 60;
+        int menit = sisaMenit % 60;
+
         dataMotor[index].terisi = false;
         totalKeluar++;
 
         cout << "\nKendaraan berhasil keluar!\n";
+        cout << "Hari keluar : " << hariKeluar << endl;
         cout << "Waktu keluar : ";
-        tampilWaktu(dataMotor[index].waktuKeluar);
+        tampilWaktu(waktuKeluar);
         cout << endl;
+
+        cout << "Durasi parkir : "
+             << durasiHari << " hari "
+             << durasiJam << " jam "
+             << menit << " menit " << endl;
+
     } else {
         cout << "\nKendaraan tidak ditemukan!\n";
     }
